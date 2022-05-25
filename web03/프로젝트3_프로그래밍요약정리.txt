@@ -1,0 +1,123 @@
+
+	common : JDBCConnection
+		 BoardVO, MemberVO, ProductVO, PaymentVO
+	model : BoardDAO, MemberDAO, ProductDAO, PaymentDAO
+	
+	시퀀스 다이어그램 : 실제 사용자가 처리 요청한 것에 대한 프로그래밍 상의 기능 흐름을 나타낸 다이어그램
+
+					List<BoardVO> getBoardList()
+	전체 데이터목록 요청			select * from board
+	index.jsp -> GetBoardListCtrl -> BoardDAO -> JDBC -> 데이터베이스
+			List<BoardVO>	List<BoardVO>	ResultSet	
+	getBoardList.jsp <- GetBoardListCtrl <- BoardDAO <- JDBC <- 데이터베이스
+						
+
+					BoardVO getBoard(int seq)
+			파라미터	BoradVO.seq  select * from board where seq=?
+	getBoardList.jsp -> GetBoardCtrl -> BoardDAO -> JDBC -> 데이터베이스
+		BoardVO		BoardVO		BoardVO	ResultSet
+	getBoard.jsp <- GetBoardCtrl <- BoardDAO <- JDBC <- 데이터베이스
+
+			
+					int addBoard(BoardVO vo)
+			BoardVO		BoardVO		insert into board values,...
+	addBoardForm.jsp -> AddBoardCtrl -> BoardDAO -> JDBC -> 데이터베이스
+	등록성공(목록)	cnt=1
+	등록실패(복귀)	cnt=0		cnt	     cnt							
+	addBoardForm.jsp <- AddBoardCtrl <- BoardDAO <- JDBC <- 데이터베이스
+
+					int editBoard(BoardVO vo)
+			BoardVO		BoardVO		update board set ,...
+	editBoardForm.jsp -> EditBoardCtrl -> BoardDAO -> JDBC -> 데이터베이스
+	수정성공(목록)	cnt=1
+	수정실패(복귀)	cnt=0		cnt	     cnt							
+	editBoardForm.jsp <- AddBoardCtrl <- BoardDAO <- JDBC <- 데이터베이스
+
+					int delBoard(int num)
+			BoardVO		BoardVO		update board set ,...
+	getBoardList.jsp -> DelBoardCtrl -> BoardDAO -> JDBC -> 데이터베이스
+	삭제성공(목록)	cnt=1
+	삭제실패(복귀)	cnt=0		cnt	     cnt							
+	getBoardList.jsp <- AddBoardCtrl <- BoardDAO <- JDBC <- 데이터베이스
+	
+	GetBoardListCtrl
+	GetBoardCtrl
+	AddBoardCtrl
+	EditBoardCtrl
+	DelBoardCtrl
+
+
+					List<BoardVO> getMemberList()
+	전체 데이터목록 요청			select * from member
+	index.jsp -> GetMemberListCtrl -> MemberDAO -> JDBC -> 데이터베이스
+				List<MemberVO>	List<MemberVO>	ResultSet	
+	getMemberList.jsp <- GetMemberListCtrl <- MemberDAO <- JDBC <- 데이터베이스
+						
+
+					MemberVO getMember(int seq)
+			파라미터	MemberVO.seq  select * from member where seq=?
+	getMemberList.jsp -> GetMemberCtrl -> MemberDAO -> JDBC -> 데이터베이스
+			MemberVO		MemberVO	MemberVO	ResultSet
+	getBoard.jsp <- GetBoardCtrl <- BoardDAO <- JDBC <- 데이터베이스
+
+			
+					int addMember(MemberVO vo)
+			MemberVO		MemberVO		insert into member values,...
+	join.jsp -> AddMemberCtrl -> MemberDAO -> JDBC -> 데이터베이스
+	회원가입성공	cnt=1
+	회원가입실패	cnt=0		cnt	     cnt							
+	login.jsp <- AddMemberCtrl <- MemberDAO <- JDBC <- 데이터베이스
+
+					int editMember(MemberVO vo)
+			MemberVO		MemberVO		update member set ,...
+	editMemberForm.jsp -> EditMemberCtrl -> MemberDAO -> JDBC -> 데이터베이스
+	수정성공(목록)	cnt=1
+	수정실패(복귀)	cnt=0		cnt	     cnt							
+	editMemberForm.jsp <- EditMemberCtrl <- MemberDAO <- JDBC <- 데이터베이스
+
+					int delMember(String uid)
+			MemberVO		MemberVO		delete member where userid=?
+	getMember.jsp -> DelMemberCtrl -> MemberDAO -> JDBC -> 데이터베이스
+	삭제성공(목록)	cnt=1
+	삭제실패(복귀)	cnt=0		cnt	     cnt							
+	index.jsp <- DelMemberCtrl <- MemberDAO <- JDBC <- 데이터베이스
+
+
+					int idCheck(String uid)
+			   uid			   uid			uid   select * from member where userid=?
+	join.jsp	-> IdCheckCtrl -> MemberDAO -> JDBC -> 데이터베이스
+	사용가능id cnt=0
+	사용불가능id cnt=1
+			   ck			   cnt			cnt   
+	join.jsp	<- IdCheckCtrl <- MemberDAO <- JDBC <- 데이터베이스
+
+
+					int login(MemberVO vo)
+			   uid			   uid			uid   select * from member where userid=?
+	loginForm.jsp	-> loginCtrl -> MemberDAO -> JDBC -> 데이터베이스
+	로그인성공 cnt=1
+	로그인실패 cnt=0
+			   session		  cnt			cnt   
+	index.jsp	<- loginCtrl <- MemberDAO <- JDBC <- 데이터베이스
+
+
+
+	BoardDAO
+	
+	1) 비밀번호 비교 패턴 SHA256/512	
+				암호화
+	회원가입 -> pw -> DB
+				암호화
+	로그인 -> pw <-> DB
+	
+	
+	2) 비밀번호 비교 패턴 BASE64
+				암호화
+	회원가입 -> pw -> DB 
+				복호화
+	로그인 -> pw <- DB
+	
+	
+	3) policy.java 또는 crypt.java 의 API를 활용
+	해당 메서드마다 방법을 선택하여 활용
+		
